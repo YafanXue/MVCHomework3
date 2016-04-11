@@ -1,0 +1,49 @@
+﻿
+@{
+    ViewBag.Title = "GenJsonResult";
+}
+
+<h2>GenJsonResult</h2>
+
+    <table>
+        <tr>
+            <td>
+                @Html.Label("客戶聯絡人Id") @Html.Label(":")
+            </td>
+            <td colspan="2">
+                <input type="text" id="contactid" name="contactid" />
+            </td>
+        </tr>
+        <tr>
+            
+            <td colspan="3">
+                @*<input type="submit" id="btnsubmit" value="取得Jsonresult">*@
+                <button id="btnJsonTest">取得JsonResult</button>
+               
+            </td>
+        </tr>
+    </table>
+
+
+@section scripts{
+    <script>
+
+        $("#btnJsonTest").on("click", function () {
+            var url = GetNewUri();
+            //    var str = $("form").serialize();
+            $.get(url, "", function (data) {
+                alert(JSON.stringify(data));
+            }, "json"
+                );
+
+
+        });
+
+        function GetNewUri() {
+            var paravalue = $("#contactid").val();
+            var newurl = '@Url.Action("GenJsonResult",new { contactid="_id_"})'.replace("_id_", paravalue);
+            return newurl;
+        }
+
+    </script>
+}
