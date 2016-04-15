@@ -10,7 +10,7 @@ namespace ParticeCustomer3.Models
     public class CustSearchViewModel
     {
         public string Keyword { get; set; }
-        public List<SelectListItem> CusType { get; set; }
+        public SelectList CusType { get; set; }
         public string sortcolumn { get; set; }
         public int Id { get; set; }
         public string 客戶名稱 { get; set; }

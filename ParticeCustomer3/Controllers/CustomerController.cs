@@ -15,14 +15,13 @@ namespace ParticeCustomer3.Controllers
     [Authorize(Roles = "sysadmin")]
     public class CustomerController : BaseController
     {
-
         // GET: Customer
-        public ActionResult Index(CustSearchViewModel CusSearch, string sortcolumn, string nameFilter,int? custypeFilter, int? page)
+        public ActionResult Index(CustSearchViewModel CusSearch, string sortcolumn, int page = 1)
         {
-            //var 客戶資料 = db.客戶資料.Include(客 => 客.客戶分類資訊);
-
-            //return View(repoCustomer.All());
-            ViewBag.CurrentSort = CusSearch.sortcolumn;
+            if (string.IsNullOrEmpty(CusSearch.sortcolumn))
+            {
+                CusSearch.sortcolumn = "cusid";
+            }
             ViewBag.NameSortParm = CusSearch.sortcolumn == "name" ? "name_desc" : "name"; //名稱
             ViewBag.SerialSortParm = CusSearch.sortcolumn == "serial" ? "serial_desc" : "serial"; //統一編號
             ViewBag.TELSortParm = CusSearch.sortcolumn == "tel" ? "tel_desc" : "tel";
@@ -30,31 +29,14 @@ namespace ParticeCustomer3.Controllers
             ViewBag.AddressSortParm = CusSearch.sortcolumn == "address" ? "address_desc" : "address";
             ViewBag.EmailSortParm = CusSearch.sortcolumn == "email" ? "email_desc" : "email";           
             ViewBag.CusTypeSortParm = CusSearch.sortcolumn == "custype" ? "custype_desc" : "custype";
-            ViewBag.CusType = repoCustomer.GetCusType();
-            if (CusSearch.Keyword != null)
-            {
-                page = 1;
-            }
-            else
-            {
-                CusSearch.Keyword = nameFilter;
-            }
-            ViewBag.nameFilter = CusSearch.Keyword;
-
-            if (CusSearch.客戶分類 != 0)
-            {
-                page = 1;
-            }
-            else
-            {
-                CusSearch.客戶分類 = custypeFilter.HasValue ? custypeFilter.Value :0;
-            }
-            ViewBag.custypeFilter = CusSearch.客戶分類;
-            CusSearch.Customers = repoCustomer.Search(CusSearch.Keyword, CusSearch.客戶分類,CusSearch.sortcolumn);
+            ViewBag.celKeyword = CusSearch.Keyword;
+            ViewBag.celCusType = CusSearch.客戶分類;
+            ViewBag.celSort = CusSearch.sortcolumn;
+            CusSearch.CusType = repoCustomer.GetCusType();
+            CusSearch.Customers = repoCustomer.Search(CusSearch.Keyword, CusSearch.客戶分類, CusSearch.sortcolumn);
 
             int pageSize = 3;
-            int pageNumber = (page ?? 1);
-            CusSearch.SearchDetails = CusSearch.Customers.ToPagedList(pageNumber, pageSize);
+            CusSearch.Customers = CusSearch.Customers.ToPagedList(page, pageSize);
             return View(CusSearch);
         }
 
@@ -72,12 +54,31 @@ namespace ParticeCustomer3.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 data =repoCustomer.Find(id.Value);
+            var data = repoCustomer.GetCustomerAndContact(id.Value);//.Find(id.Value);
             if (data == null)
             {
                 return HttpNotFound();
             }
             return View(data);
+        }
+
+        [HttpPost]
+        public ActionResult Details(int id,IList<UpdateBatchContact> data)
+        {
+            if (TryUpdateModel(data, new string[] { "Id", "職稱", "手機", "電話" }))
+            //if(ModelState.IsValid)
+            {
+                foreach(var item in data)
+                {
+                    var contact = repoContact.Find(item.Id);
+                    contact.職稱 = item.職稱;
+                    contact.電話 = item.電話;
+                    contact.手機 = item.手機;
+                }
+                repoContact.UnitOfWork.Commit();
+            }
+
+            return View(repoCustomer.GetCustomerAndContact(id));
         }
 
         // GET: Customer/Create
@@ -119,7 +120,6 @@ namespace ParticeCustomer3.Controllers
             {
                 return HttpNotFound();
             }
-            //ViewBag.客戶分類 = new SelectList(repoCustType.All(), "Id", "分類名稱", 客戶資料.客戶分類);
             ViewBag.客戶分類 =repoCustomer.GetCusType(客戶資料);
             return View(客戶資料);
         }
@@ -200,9 +200,11 @@ namespace ParticeCustomer3.Controllers
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult ExcelExport()
+        public ActionResult ExcelExport(string Keyword,int 客戶分類,  string sortcolumn)
         {
-            return File(repoCustomer.GenerateDataTable(), "application/vnd.ms-excel", "customers.xls");
+            var data = repoCustomer.Search(Keyword, 客戶分類, sortcolumn);
+
+            return File(repoCustomer.GenerateDataTable(data), "application/vnd.ms-excel", "customers.xls");
         }
 
         protected override void Dispose(bool disposing)

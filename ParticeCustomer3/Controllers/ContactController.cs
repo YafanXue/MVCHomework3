@@ -15,10 +15,13 @@ namespace ParticeCustomer3.Controllers
     public class ContactController : BaseController
     {
         // GET: Contact
-        public ActionResult Index(string Title ,string sortcolumn,string currentFilter, int? page)
+        public ActionResult Index(string Title ,string sortcolumn,int page=1)
         {
             //var 客戶聯絡人 = db.客戶聯絡人.Include(客 => 客.客戶資料);
-            ViewBag.CurrentSort = sortcolumn;
+            if (string.IsNullOrEmpty(sortcolumn))
+            {
+                sortcolumn = "contactid";
+            }
             ViewBag.TitleSortParm = sortcolumn == "title" ? "title_desc" : "title";
             ViewBag.NameSortParm = sortcolumn == "name" ? "name_desc" : "name";
             ViewBag.EmailSortParm= sortcolumn == "email" ? "email_desc" : "email";
@@ -26,21 +29,13 @@ namespace ParticeCustomer3.Controllers
             ViewBag.TELSortParm = sortcolumn == "tel" ? "tel_desc" : "tel";
             ViewBag.CusName= sortcolumn == "cusname" ? "cusname_desc" : "cusname";
             ViewBag.TitleList = repoContact.GetContactTitleList();
-            if (Title != null)
-            {
-                page = 1;
-            }
-            else
-            {
-                Title = currentFilter;
-            }
+            
 
             ViewBag.CurrentFilter = Title;
             var data = repoContact.Search(Title, sortcolumn);
-           
+
             int pageSize = 3;
-            int pageNumber = (page ?? 1);
-            return View(data.ToPagedList(pageNumber, pageSize));
+            return View(data.ToPagedList(page, pageSize));
             //return View(repoContact.Search(Title, sortcolumn));
         }
 

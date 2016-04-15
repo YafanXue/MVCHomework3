@@ -33,6 +33,20 @@
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
+            <div>
+                <ul class="breadcrumb">
+                    <li>
+                        <i class="icon-home"></i>
+                        <a href="@Url.Action("Index","Home")">Home</a>
+                        <i class="icon-angle-right"></i>
+                    </li>
+                    @RenderSection("breadcrumb", false)
+                    @if (!IsSectionDefined("breadcrumb"))
+                    {
+                        <li><a href="#">nothing</a></li>
+                    }
+                </ul>
+            </div>
         </div>
     </div>
     <div class="container body-content">

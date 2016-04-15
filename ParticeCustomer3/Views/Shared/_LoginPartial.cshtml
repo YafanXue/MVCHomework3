@@ -7,13 +7,13 @@
 
         <ul class="nav navbar-nav navbar-right">
             <li>
-                @if (User.Identity.GetUserName() != "admin")
+                @if (!Context.User.IsInRole("sysadmin"))
                 {
                     @Html.ActionLink("編輯個人資料 " + User.Identity.GetUserName() + "!", "EditProfile", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })
                 }
                 else
                 {
-                    @Html.Label("編輯個人資料 " + User.Identity.GetUserName() + "!")
+                    @Html.ActionLink("Hi " + User.Identity.GetUserName() + "!", "", "", routeValues: null, htmlAttributes: new { title = "Manage" })
                 }
             </li>
             <li>@Html.ActionLink("Sign Out", "Logout", "Account")</li>

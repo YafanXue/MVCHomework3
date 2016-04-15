@@ -34,6 +34,9 @@ namespace ParticeCustomer3.Models
             }
             switch (sortcolumn)
             {
+                case "cusid":
+                    data = data.OrderBy(p => p.Id);
+                    break;
                 case "name":
                     data = data.OrderBy(p => p.客戶名稱);
                     break;
@@ -88,6 +91,16 @@ namespace ParticeCustomer3.Models
             return this.All().FirstOrDefault(p => p.Id == id);
         }
 
+        public CusContactViewModel GetCustomerAndContact(int id)
+        {
+            CusContactViewModel data = new CusContactViewModel();
+            data.Customer = this.All().FirstOrDefault(p => p.Id == id);
+            data.Contacts = data.Customer.客戶聯絡人.Where(p => p.已刪除 == false);
+            return data;
+        }
+
+
+
         public 客戶資料 FindByAccount(string ACCOUNT,int Id=0)
         {
             var data = this.All().FirstOrDefault(p => p.ACCOUNT == ACCOUNT);
@@ -141,11 +154,11 @@ namespace ParticeCustomer3.Models
             return new SelectList(data, "Id", "分類名稱", entity.客戶分類);
         }
 
-        public Stream GenerateDataTable()
+        public Stream GenerateDataTable(IEnumerable<客戶資料> data)
         {
-            var data = RepositoryHelper.GetCustsExcelViewRepository();
-
-            return NPOIExcel.RenderListToExcel(data.All().ToList());
+            // var data = RepositoryHelper.GetCustsExcelViewRepository();
+            var query = data.Select(p => new { p.Id, p.客戶名稱, p.統一編號, p.地址, p.Email, p.電話, p.傳真 });
+            return NPOIExcel.RenderListToExcel(query.ToList());
         }
     }
 

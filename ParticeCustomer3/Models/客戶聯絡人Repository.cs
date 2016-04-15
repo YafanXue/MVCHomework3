@@ -73,6 +73,11 @@ namespace ParticeCustomer3.Models
             return this.All().FirstOrDefault(p => p.Id == id);
         }
 
+        public 客戶聯絡人 FindAllById(int id)
+        {
+            return base.All().FirstOrDefault(p => p.Id == id);
+        }
+
         public SelectList GetCustomer()
         {
             var data = RepositoryHelper.Get客戶資料Repository().All();

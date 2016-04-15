@@ -1,5 +1,6 @@
 ﻿
 @model  ParticeCustomer3.Models.CustSearchViewModel
+@using PagedList;
 @using PagedList.Mvc;
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
@@ -9,11 +10,15 @@
 
 <h2>Index</h2> 
 
-<p>
-    @Html.ActionLink("[Create New]", "Create")    @Html.ActionLink("[Export to Excel]", "ExcelExport")
+<p></p>
 
-    @using (Html.BeginForm("Index", "Customer", FormMethod.Get))
+    @using (Html.BeginForm("Index", "Customer", FormMethod.Get, new { name = "form1" }))
     {
+        @Html.ActionLink("[Create New]", "Create")    @Html.ActionLink("[Export to Excel]", "ExcelExport", new { Keyword = ViewBag.celKeyword, 客戶分類= ViewBag.celCusType, sortcolumn= ViewBag.celSort }, new { onclick = "this.form.submit();" })
+
+        @Html.Hidden("sortcolumn")
+        @Html.Hidden("page")
+
         <table>
             <tr>
                 <td>
@@ -28,49 +33,42 @@
                     @Html.Label("客戶分類:")
                 </td>
                 <td>
-                    @Html.DropDownList("客戶分類", (IEnumerable<SelectListItem>)ViewBag.CusType,"", htmlAttributes: new { @class = "form-control" })
+                    @Html.DropDownList("客戶分類", Model.CusType, "--請選擇--", htmlAttributes: new { @class = "form-control" })
                 </td>
                 <td>
                     <input type="submit" value="Search">
                 </td>
             </tr>
         </table>
-    }
-</p>
+
+
 <table class="table">
     <tr>
         <th>
-            @*@Html.DisplayNameFor(model => model.客戶名稱)*@
-            @Html.ActionLink("客戶名稱", "Index", new { sortcolumn = ViewBag.NameSortParm, nameFilter = ViewBag.nameFilter, custypeFilter = ViewBag.custypeFilter })
+            <a href="@Url.Action("Index", "Customer")" onclick="return MakeSort('@ViewBag.NameSortParm');">@Html.DisplayNameFor(model => model.客戶名稱)</a>
         </th>
         <th>
-            @*@Html.DisplayNameFor(model => model.統一編號)*@
-            @Html.ActionLink("統一編號", "Index", new { sortcolumn = ViewBag.SerialSortParm, nameFilter = ViewBag.nameFilter, custypeFilter = ViewBag.custypeFilter })
+            <a href="@Url.Action("Index", "Customer")" onclick="return MakeSort('@ViewBag.SerialSortParm');">@Html.DisplayNameFor(model => model.統一編號)</a>
         </th>
         <th>
-            @*@Html.DisplayNameFor(model => model.電話)*@
-            @Html.ActionLink("電話", "Index", new { sortcolumn = ViewBag.TELSortParm, nameFilter = ViewBag.nameFilter, custypeFilter = ViewBag.custypeFilter })
+            <a href="@Url.Action("Index", "Customer")" onclick="return MakeSort('@ViewBag.TELSortParm');">@Html.DisplayNameFor(model => model.電話)</a>
         </th>
         <th>
-            @*@Html.DisplayNameFor(model => model.傳真)*@
-            @Html.ActionLink("傳真", "Index", new { sortcolumn = ViewBag.FAXSortParm, nameFilter = ViewBag.nameFilter, custypeFilter = ViewBag.custypeFilter })
+            <a href="@Url.Action("Index", "Customer")" onclick="return MakeSort('@ViewBag.FAXSortParm');">@Html.DisplayNameFor(model => model.傳真)</a>
         </th>
         <th>
-            @*@Html.DisplayNameFor(model => model.地址)*@
-            @Html.ActionLink("地址", "Index", new { sortcolumn = ViewBag.AddressSortParm, nameFilter = ViewBag.nameFilter, custypeFilter = ViewBag.custypeFilter })
+            <a href="@Url.Action("Index", "Customer")" onclick="return MakeSort('@ViewBag.AddressSortParm');">@Html.DisplayNameFor(model => model.地址)</a>
         </th>
         <th>
-            @*@Html.DisplayNameFor(model => model.Email)*@
-            @Html.ActionLink("Email", "Index", new { sortcolumn = ViewBag.EmailSortParm, nameFilter = ViewBag.nameFilter, custypeFilter = ViewBag.custypeFilter })
+            <a href="@Url.Action("Index", "Customer")" onclick="return MakeSort('@ViewBag.EmailSortParm');">@Html.DisplayNameFor(model => model.Email)</a>
         </th>
         <th>
-            @*@Html.DisplayNameFor(model => model.客戶分類)*@
-            @Html.ActionLink("客戶分類", "Index", new { sortcolumn = ViewBag.CusTypeSortParm, nameFilter = ViewBag.nameFilter, custypeFilter = ViewBag.custypeFilter })
+            <a href="@Url.Action("Index", "Customer")" onclick="return MakeSort('@ViewBag.CusTypeSortParm');">@Html.DisplayNameFor(model => model.客戶分類)</a>
         </th>
         <th></th>
     </tr>
 
-@foreach (var item in Model.SearchDetails) {
+@foreach (var item in Model.Customers) {
     <tr>
         <td>
             @Html.DisplayFor(modelItem => item.客戶名稱)
@@ -95,16 +93,35 @@
             @Html.DisplayFor(modelItem => item.客戶分類資訊.分類名稱)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
         </td>
     </tr>
 }
 
 </table>
+    }
 <br />
-   Page @(Model.SearchDetails.PageCount < Model.SearchDetails.PageNumber ? 0 : Model.SearchDetails.PageNumber) of @Model.SearchDetails.PageCount
-
-@Html.PagedListPager(Model.SearchDetails, page => Url.Action("Index",
-    new { page, sortcolumn = ViewBag.CurrentSort, nameFilter = ViewBag.nameFilter, custypeFilter = ViewBag.custypeFilter }))
+@Html.PagedListPager(Model.Customers as IPagedList, p => Url.Action("Index", new { page = p }))
+@section breadcrumb{
+<li><a href="@Url.Action("Index","Customer")">客戶資料管理</a></li>
+}
+@section scripts{
+    <script>
+        $(function () {
+            $('.pagination a').on('click', function () {
+                var href = $(this).attr('href');
+                var pid = href.substring(href.indexOf('?page=') + 6);
+                document.form1.page.value = pid;
+                document.form1.submit();
+                return false;
+            });
+        });
+        function MakeSort(column) {
+            document.form1.sortcolumn.value = column;
+            document.form1.submit();
+            return false;
+        }
+    </script>
+}
