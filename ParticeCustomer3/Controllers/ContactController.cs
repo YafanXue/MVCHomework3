@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using ParticeCustomer3.Models;
 using PagedList;
+using System.Data.Entity.Validation;
 
 namespace ParticeCustomer3.Controllers
 {
@@ -39,6 +40,13 @@ namespace ParticeCustomer3.Controllers
             //return View(repoContact.Search(Title, sortcolumn));
         }
 
+        public ActionResult ExcelExport(string Title, string sortcolumn, int page = 1)
+        {
+            var data = repoContact.Search(Title, sortcolumn);
+
+            return File(repoContact.GenerateDataTable(data), "application/vnd.ms-excel", "bank.xls");
+        }
+
         // GET: Contact/Details/5
         public ActionResult Details(int? id)
         {
@@ -66,7 +74,7 @@ namespace ParticeCustomer3.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,客戶Id,職稱,姓名,Email,手機,電話")] 客戶聯絡人 客戶聯絡人)
+        public ActionResult Create([Bind(Include = "客戶Id,職稱,姓名,Email,手機,電話")] 客戶聯絡人 客戶聯絡人)
         {
             if (ModelState.IsValid)
             {
@@ -102,14 +110,14 @@ namespace ParticeCustomer3.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id,FormCollection form)
         {
-            var 客戶聯絡人 = repoContact.Find(id);
-            if (TryUpdateModel(客戶聯絡人,new string[] { "Id","客戶Id","職稱","姓名","Email","手機","電話" }))
+            var data = repoContact.Find(id);
+            if(TryUpdateModel(data, new string[] { "Id", "客戶Id", "職稱", "姓名", "Email", "手機", "電話" }))
             {
                 repoContact.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            ViewBag.客戶Id = repoContact.GetCustomer(客戶聯絡人);
-            return View(客戶聯絡人);
+            ViewBag.客戶Id = repoContact.GetCustomer(data);
+            return View(data);
         }
 
         // GET: Contact/Delete/5
@@ -133,9 +141,9 @@ namespace ParticeCustomer3.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             客戶聯絡人 客戶聯絡人 = repoContact.Find(id);
-            //db.客戶聯絡人.Remove(客戶聯絡人);
-            //db.SaveChanges();
+
             repoContact.Delete(客戶聯絡人);
+            repoContact.UnitOfWork.Commit();
             return RedirectToAction("Index");
         }
 

@@ -10,64 +10,8 @@
 <div>
     <h4>客戶聯絡人</h4>
     <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.職稱)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.職稱)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.姓名)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.姓名)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.手機)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.手機)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.電話)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.電話)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.已刪除)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.已刪除)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.客戶資料.客戶名稱)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.客戶資料.客戶名稱)
-        </dd>
-
-    </dl>
+    @Html.HiddenFor(model=>model.Id)
+    @Html.DisplayForModel("Contact")
 
     @using (Html.BeginForm()) {
         @Html.AntiForgeryToken()
@@ -78,3 +22,6 @@
         </div>
     }
 </div>
+@section breadcrumb{
+    <li><a href="@Url.Action("Index","Contact")">客戶聯絡人管理</a></li>
+}

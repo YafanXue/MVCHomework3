@@ -1,0 +1,13 @@
+﻿@using ParticeCustomer3.Models;
+
+@{
+    var data = RepositoryHelper.Get客戶資料Repository();
+    List<SelectListItem> cusitems = new List<SelectListItem>();
+    foreach (客戶資料 item in data.All())
+    {
+        cusitems.Add(new SelectListItem() { Text = item.客戶名稱, Value = item.Id.ToString() });
+    }
+
+
+}
+@Html.Label("請選擇客戶") @Html.DropDownList("客戶Id", (IEnumerable<SelectListItem>)cusitems, "請選擇",new { onchange="this.form.submit();"})

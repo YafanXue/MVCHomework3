@@ -12,6 +12,8 @@ namespace ParticeCustomer3.Models
 
         public override bool IsValid(object value)
         {
+            if (value == null)
+                return true;
             const string regexPattern = @"\d{4}-\d{6}";
             var regex = new Regex(regexPattern);
             var retvalue = regex.IsMatch((string)value);

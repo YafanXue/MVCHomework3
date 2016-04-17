@@ -463,6 +463,15 @@
     <Content Include="Views\Account\EditProfile.cshtml" />
     <Content Include="Views\Customer\GenJsonResult.cshtml" />
     <Content Include="Views\Customer\Contacts.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\Contact.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Contact.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Customer.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\Customer.cshtml" />
+    <Content Include="Views\Customer\CustomerDtl.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Bank.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\Bank.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\CustName.cshtml" />
+    <Content Include="Views\Bank\CustList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

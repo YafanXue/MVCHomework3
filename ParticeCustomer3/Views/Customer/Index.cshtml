@@ -14,8 +14,8 @@
 
     @using (Html.BeginForm("Index", "Customer", FormMethod.Get, new { name = "form1" }))
     {
-        @Html.ActionLink("[Create New]", "Create")    @Html.ActionLink("[Export to Excel]", "ExcelExport", new { Keyword = ViewBag.celKeyword, 客戶分類= ViewBag.celCusType, sortcolumn= ViewBag.celSort }, new { onclick = "this.form.submit();" })
-
+        @Html.ActionLink("[Create New]", "Create")    @*@Html.ActionLink("[Export to Excel]", "ExcelExport", new { Keyword = ViewBag.celKeyword, 客戶分類= ViewBag.celCusType, sortcolumn= ViewBag.celSort }, new { onclick = "this.form.submit();" })*@
+        <a href="" onclick="return ExcelSubmit('@Url.Action("ExcelExport")')">[Export to Excel2]</a>
         @Html.Hidden("sortcolumn")
         @Html.Hidden("page")
 
@@ -33,7 +33,7 @@
                     @Html.Label("客戶分類:")
                 </td>
                 <td>
-                    @Html.DropDownList("客戶分類", Model.CusType, "--請選擇--", htmlAttributes: new { @class = "form-control" })
+                    @Html.DropDownList("客戶分類", Model.CusType, "--請選擇--",new { onchange="this.form.submit();"})
                 </td>
                 <td>
                     <input type="submit" value="Search">
@@ -121,6 +121,14 @@
         function MakeSort(column) {
             document.form1.sortcolumn.value = column;
             document.form1.submit();
+            return false;
+        }
+
+        function ExcelSubmit(actionname) {
+
+            document.form1.action = actionname;
+            document.form1.submit();
+            document.form1.action = "@Url.Action("Index", "Customer")";
             return false;
         }
     </script>

@@ -1,41 +1,47 @@
 ﻿@model IEnumerable<ParticeCustomer3.Models.客戶銀行資訊>
-
+@using PagedList;
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 @{
     ViewBag.Title = "Index";
 }
 
 <h2>Index</h2>
-
+@using (Html.BeginForm("Index", "Bank", FormMethod.Get,new { name="form1"}))
+{
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("[Create New]", "Create") <a href="" onclick="return ExcelSubmit('@Url.Action("ExcelExport","Bank")')">[Export to Excel]</a>
 </p>
+@Html.Partial("CustList" )
+
+    @Html.Hidden("sortcolumn")
+    @Html.Hidden("page")
+
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.銀行名稱)
+            <a href="@Url.Action("Index","Bank")" onclick="return MakeSort('@ViewBag.BkNameSortParm');">@Html.DisplayNameFor(model => model.銀行名稱)</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.銀行代碼)
+            <a href="@Url.Action("Index","Bank")" onclick="return MakeSort('@ViewBag.BkIdSortParm');">@Html.DisplayNameFor(model => model.銀行代碼)</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.分行代碼)
+            <a href="@Url.Action("Index","Bank")" onclick="return MakeSort('@ViewBag.BranchSortParm');">@Html.DisplayNameFor(model => model.分行代碼)</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.帳戶名稱)
+            <a href="@Url.Action("Index","Bank")" onclick="return MakeSort('@ViewBag.AccNameSortParm');">@Html.DisplayNameFor(model => model.帳戶名稱)</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.帳戶號碼)
+            <a href="@Url.Action("Index","Bank")" onclick="return MakeSort('@ViewBag.AccountSortParm');">@Html.DisplayNameFor(model => model.帳戶號碼)</a>
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.已刪除)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.客戶資料.客戶名稱)
+            <a href="@Url.Action("Index","Bank")" onclick="return MakeSort('@ViewBag.CusSortParm');">@Html.DisplayNameFor(model => model.客戶資料.客戶名稱)</a>
         </th>
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
+@foreach (var item in Model)
+{
     <tr>
         <td>
             @Html.DisplayFor(modelItem => item.銀行名稱)
@@ -52,18 +58,47 @@
         <td>
             @Html.DisplayFor(modelItem => item.帳戶號碼)
         </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.已刪除)
-        </td>
+       
         <td>
             @Html.DisplayFor(modelItem => item.客戶資料.客戶名稱)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
         </td>
     </tr>
 }
 
 </table>
+}
+@Html.PagedListPager(Model as IPagedList, p => Url.Action("Index", new { page = p }))
+@section breadcrumb{
+    <li><a href="@Url.Action("Index","Bank")">銀行帳戶管理</a></li>
+}
+@section scripts{
+    <script>
+        $(function () {
+            $('.pagination a').on('click', function () {
+                var href = $(this).attr('href');
+                var pid = href.substring(href.indexOf('?page=') + 6);
+                document.form1.page.value = pid;
+                document.form1.submit();
+                return false;
+            });
+        });
+        function MakeSort(column) {
+            document.form1.sortcolumn.value = column;
+            document.form1.submit();
+            return false;
+        }
+
+        function ExcelSubmit(actionname) {
+
+            document.form1.action = actionname;
+            document.form1.submit();
+            document.form1.action = "@Url.Action("Index", "Bank")";
+            return false;
+        }
+    </script>
+}

@@ -5,114 +5,26 @@
 }
 
 <h2>Details</h2>
+@Html.Partial("CustomerDtl",Model)
 
-<div>
-    <h4>客戶資料</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Customer.客戶名稱)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Customer.客戶名稱)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Customer.統一編號)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Customer.統一編號)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Customer.電話)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Customer.電話)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Customer.傳真)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Customer.傳真)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Customer.地址)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Customer.地址)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Customer.Email)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Customer.Email)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Customer.客戶分類資訊.分類名稱)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Customer.客戶分類資訊.分類名稱)
-        </dd>
-
-    </dl>
-</div>
 @using (Html.BeginForm())
 {
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Customer.Id }) |
-    @Html.ActionLink("Back to List", "Index")
-    <input type="submit" value="批次更新資料" />
-</p>
-<hr />
-<table class="table">
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Customer.Id }) |
+        @Html.ActionLink("Back to List", "Index")
 
-    @{ var data = Model.Contacts.ToArray();}
-    @*@foreach (var item in Model.Contact)*@
-    @for (var i = 0; i < data.Length; i++)
-            {
-        @Html.HiddenFor(modelItem => data[i].Id)
-        @Html.HiddenFor(modelItem => data[i].客戶Id)
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => data[i].Id)
-            </td>
-            <td>
-                @Html.EditorFor(modelItem => data[i].職稱)
-                @Html.ValidationMessageFor(modelItem => data[i].職稱, "", new { @class = "text-danger" })
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => data[i].姓名)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => data[i].Email)
-            </td>
-            <td>
-                @Html.EditorFor(modelItem => data[i].手機)<br />
-                @Html.ValidationMessageFor(modelItem => data[i].手機, "", new { @class = "text-danger" })
-            </td>
-            <td>
-                @Html.EditorFor(modelItem => data[i].電話)<br />
-                @Html.ValidationMessageFor(modelItem => data[i].電話, "", new { @class = "text-danger" })
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => data[i].客戶資料.客戶名稱)
-            </td>
-        </tr>
-    }
+        @if (Model.Contacts.ToArray().Length > 0)
+        {
+            <input type="submit" value="批次更新資料" />
+        }
+        else {
+            <input type="submit" value="批次更新資料" disabled="disabled" style="background-color:darkgray" />
+        }
+    </p>
+    @Html.Partial("Contacts", Model.Contacts)
 
-</table>
-
+}
+@section breadcrumb{
+    <li><a href="@Url.Action("Index","Customer")">客戶資料管理</a></li>
 }

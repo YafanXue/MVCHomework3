@@ -11,6 +11,7 @@ namespace ParticeCustomer3.Controllers
     [HandleError(ExceptionType = typeof(InvalidOperationException), View = "Error2")]
     [HandleError(ExceptionType = typeof(Exception), View = "Error2")]
     [CalculateActionSpendTimes]
+    [Authorize(Roles = "sysadmin")]
     public class BaseController : Controller
     {
         protected 客戶資料Repository repoCustomer = RepositoryHelper.Get客戶資料Repository();

@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Web.Mvc;
+using System.IO;
+using ParticeCustomer.Models;
 
 namespace ParticeCustomer3.Models
 {   
@@ -11,6 +13,13 @@ namespace ParticeCustomer3.Models
         public override IQueryable<客戶聯絡人> All()
         {
             return base.All().Where(p => p.已刪除 == false).Include(p => p.客戶資料);
+        }
+
+        public Stream GenerateDataTable(IEnumerable<客戶聯絡人> data)
+        {
+            // var data = RepositoryHelper.GetCustsExcelViewRepository();
+            var query = data.Select(p => new { p.Id, p.姓名, p.手機, p.職稱, p.Email, p.電話, p.客戶資料.客戶名稱 });
+            return NPOIExcel.RenderListToExcel(query.ToList());
         }
 
         public IQueryable<客戶聯絡人> Search(string Title,string sortcolumn)

@@ -1,0 +1,9 @@
+﻿@using ParticeCustomer3.Models;
+@model int?
+@{
+    var repocus = RepositoryHelper.Get客戶資料Repository();
+    var data= repocus.All();
+
+    var cusname = new SelectList(data, "Id", "客戶名稱", Model);
+}
+@Html.DropDownList("", cusname, "請選擇")

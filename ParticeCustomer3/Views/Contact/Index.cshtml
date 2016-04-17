@@ -11,13 +11,14 @@
 
 <p>
     @Html.ActionLink("Create New", "Create")
+    <a href="" onclick="return ExportExcel('@Url.Action("ExcelExport","Contact")')">[Export to Excel]</a>
 </p>
     @using (Html.BeginForm("Index", "Contact", FormMethod.Get,new { name="form1"}))
     {
-        @Html.Label("職稱:") @Html.DropDownList("Title", (IEnumerable<SelectListItem>)ViewBag.TitleList, "--請選擇--", htmlAttributes: new { @class = "form-control" })
-        <input type="submit" value="Search">
+        @Html.Label("職稱:") @Html.DropDownList("Title", (IEnumerable<SelectListItem>)ViewBag.TitleList, "--請選擇--",new { onchange="this.form.submit();"})
+        @*<input type="submit" value="Search">*@
    @Html.Hidden("sortcolumn")
-
+        @Html.Hidden("page")
 <table class="table">
     <tr>
         <th>
@@ -92,6 +93,13 @@
         function MakeSort(column) {
             document.form1.sortcolumn.value = column;
             document.form1.submit();
+            return false;
+        }
+
+        function ExportExcel(actionname) {
+           document.form1.action = actionname;
+            document.form1.submit();
+            document.form1.action = "@Url.Action("Index", "Contact")";
             return false;
         }
     </script>

@@ -14,6 +14,7 @@ namespace ParticeCustomer3.Models
         [Required]
         public int Id { get; set; }
         [Required]
+        [UIHint("CustName")]
         public int 客戶Id { get; set; }
         
         [StringLength(50, ErrorMessage="欄位長度不得大於 50 個字元")]

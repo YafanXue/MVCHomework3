@@ -29,9 +29,9 @@ namespace ParticeCustomer3.Controllers
             ViewBag.AddressSortParm = CusSearch.sortcolumn == "address" ? "address_desc" : "address";
             ViewBag.EmailSortParm = CusSearch.sortcolumn == "email" ? "email_desc" : "email";           
             ViewBag.CusTypeSortParm = CusSearch.sortcolumn == "custype" ? "custype_desc" : "custype";
-            ViewBag.celKeyword = CusSearch.Keyword;
-            ViewBag.celCusType = CusSearch.客戶分類;
-            ViewBag.celSort = CusSearch.sortcolumn;
+            //ViewBag.celKeyword = CusSearch.Keyword;
+            //ViewBag.celCusType = CusSearch.客戶分類;
+            //ViewBag.celSort = CusSearch.sortcolumn;
             CusSearch.CusType = repoCustomer.GetCusType();
             CusSearch.Customers = repoCustomer.Search(CusSearch.Keyword, CusSearch.客戶分類, CusSearch.sortcolumn);
 
@@ -94,7 +94,7 @@ namespace ParticeCustomer3.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email,客戶分類,ACCOUNT,PASSWORD")] 客戶資料 客戶資料)
+        public ActionResult Create([Bind(Include = "客戶名稱,統一編號,電話,傳真,地址,Email,客戶分類,ACCOUNT,PASSWORD")] 客戶資料 客戶資料)
         {
             if (ModelState.IsValid)
             {
@@ -200,9 +200,9 @@ namespace ParticeCustomer3.Controllers
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult ExcelExport(string Keyword,int 客戶分類,  string sortcolumn)
+        public ActionResult ExcelExport(CustSearchViewModel CusSearch, string sortcolumn, int page = 1)
         {
-            var data = repoCustomer.Search(Keyword, 客戶分類, sortcolumn);
+            var data = repoCustomer.Search(CusSearch.Keyword, CusSearch.客戶分類, sortcolumn);
 
             return File(repoCustomer.GenerateDataTable(data), "application/vnd.ms-excel", "customers.xls");
         }

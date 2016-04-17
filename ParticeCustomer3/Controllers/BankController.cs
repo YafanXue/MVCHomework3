@@ -7,21 +7,40 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using ParticeCustomer3.Models;
+using PagedList;
 
 namespace ParticeCustomer3.Controllers
 {
-    [Authorize(Roles = "sysadmin")]
-    public class BankController : Controller
+    public class BankController : BaseController
     {
-        private 客戶資料Entities db = new 客戶資料Entities();
+        //private 客戶資料Entities db = new 客戶資料Entities();
 
         // GET: Bank
-        public ActionResult Index()
+        public ActionResult Index(int? 客戶Id,string sortcolumn, int page = 1)
         {
-            var 客戶銀行資訊 = db.客戶銀行資訊.Include(客 => 客.客戶資料);
-            return View(客戶銀行資訊.ToList());
+            if (string.IsNullOrEmpty(sortcolumn))
+            {
+                sortcolumn = "bankid";
+            }
+            ViewBag.BkNameSortParm = sortcolumn == "bkname" ? "bkname_desc" : "bkname";
+            ViewBag.BkIdSortParm = sortcolumn == "bkid" ? "bkid_desc" : "bkid";
+            ViewBag.BranchSortParm = sortcolumn == "branch" ? "branch_desc" : "branch";
+            ViewBag.AccNameSortParm = sortcolumn == "accname" ? "accname_desc" : "accname";
+            ViewBag.AccountSortParm = sortcolumn == "account" ? "account_desc" : "account";
+            ViewBag.CusSortParm = sortcolumn == "cusname" ? "cusname_desc" : "cusname";
+            var cusid = 客戶Id.HasValue ? 客戶Id.Value : 0;
+            var 客戶銀行資訊 = repoBank.Search(cusid, sortcolumn);
+            int pageSize = 3;
+            return View(客戶銀行資訊.ToPagedList(page, pageSize));
+            //return View(客戶銀行資訊);
         }
+        public ActionResult ExcelExport(int? 客戶Id,string sortcolumn, int page = 1)
+        {
+            var cusid = 客戶Id.HasValue ? 客戶Id.Value : 0;
+            var data = repoBank.Search(cusid, sortcolumn);
 
+            return File(repoBank.GenerateDataTable(data), "application/vnd.ms-excel", "bank.xls");
+        }
         // GET: Bank/Details/5
         public ActionResult Details(int? id)
         {
@@ -29,7 +48,7 @@ namespace ParticeCustomer3.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = repoBank.Find(id.Value);
             if (客戶銀行資訊 == null)
             {
                 return HttpNotFound();
@@ -40,7 +59,7 @@ namespace ParticeCustomer3.Controllers
         // GET: Bank/Create
         public ActionResult Create()
         {
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱");
+            ViewBag.客戶Id =repoBank.GetCustomer();
             return View();
         }
 
@@ -49,16 +68,16 @@ namespace ParticeCustomer3.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,客戶Id,銀行名稱,銀行代碼,分行代碼,帳戶名稱,帳戶號碼,已刪除")] 客戶銀行資訊 客戶銀行資訊)
+        public ActionResult Create([Bind(Include = "客戶Id,銀行名稱,銀行代碼,分行代碼,帳戶名稱,帳戶號碼")] 客戶銀行資訊 客戶銀行資訊)
         {
             if (ModelState.IsValid)
             {
-                db.客戶銀行資訊.Add(客戶銀行資訊);
-                db.SaveChanges();
+                repoBank.Add(客戶銀行資訊);
+                repoBank.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
 
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
+            ViewBag.客戶Id = repoBank.GetCustomer();
             return View(客戶銀行資訊);
         }
 
@@ -69,12 +88,12 @@ namespace ParticeCustomer3.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = repoBank.Find(id.Value);
             if (客戶銀行資訊 == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
+            ViewBag.客戶Id =repoBank.GetCustomer(客戶銀行資訊.客戶Id);
             return View(客戶銀行資訊);
         }
 
@@ -83,16 +102,16 @@ namespace ParticeCustomer3.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,客戶Id,銀行名稱,銀行代碼,分行代碼,帳戶名稱,帳戶號碼,已刪除")] 客戶銀行資訊 客戶銀行資訊)
+        public ActionResult Edit(int  id, FormCollection form)
         {
-            if (ModelState.IsValid)
+            var data = repoBank.Find(id);
+            if (TryUpdateModel(data,new string[] {"Id","客戶Id", "銀行名稱","銀行代碼","分行代碼","帳戶名稱","帳戶號碼"}))
             {
-                db.Entry(客戶銀行資訊).State = EntityState.Modified;
-                db.SaveChanges();
+                repoBank.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
-            return View(客戶銀行資訊);
+            ViewBag.客戶Id = repoBank.GetCustomer();
+            return View(data);
         }
 
         // GET: Bank/Delete/5
@@ -102,7 +121,7 @@ namespace ParticeCustomer3.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
+            客戶銀行資訊 客戶銀行資訊 = repoBank.Find(id.Value);
             if (客戶銀行資訊 == null)
             {
                 return HttpNotFound();
@@ -115,9 +134,9 @@ namespace ParticeCustomer3.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
-            db.客戶銀行資訊.Remove(客戶銀行資訊);
-            db.SaveChanges();
+            客戶銀行資訊 客戶銀行資訊 = repoBank.Find(id);
+            repoBank.Delete(客戶銀行資訊);
+            repoBank.UnitOfWork.Commit();
             return RedirectToAction("Index");
         }
 
@@ -125,7 +144,7 @@ namespace ParticeCustomer3.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                repoBank.UnitOfWork.Context.Dispose();
             }
             base.Dispose(disposing);
         }
